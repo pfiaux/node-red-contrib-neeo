@@ -1,0 +1,49 @@
+{
+  "name": "node-red-contrib-neeo",
+  "version": "0.0.0",
+  "description": "Notes to interact with the NEEO Brain",
+  "license": "MIT",
+  "node-red": {
+    "nodes": {
+      "active-now": "active-now.js",
+      "neeo-brain": "neeo-brain.js"
+    }
+  },
+  "scripts": {
+    "eslint": "eslint ./*.js test/",
+    "test": "nyc mocha 'test/**/*.test.js'"
+  },
+  "dependencies": {
+    "got": "^8.3.2"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "eslint": "^5.2.0",
+    "mocha": "^5.2.0",
+    "nock": "9.4.2",
+    "node-red": "^0.18.7",
+    "node-red-node-test-helper": "^0.1.8",
+    "nyc": "^12.0.2",
+    "sinon": "^6.1.4",
+    "sinon-chai": "^3.2.0"
+  },
+  "nyc": {
+    "check-coverage": true,
+    "lines": 90,
+    "statements": 90,
+    "functions": 90,
+    "branches": 90,
+    "include": [
+      "**/*.js",
+      "lib/**/*.js"
+    ],
+    "exclude": [
+      "test/**/*.js"
+    ],
+    "reporter": [
+      "lcov",
+      "text-summary"
+    ],
+    "cache": true
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "files.exclude": {
+    "**/.nyc_output": true,
+    "**/coverage": true,
+  },
+  "editor.tabSize": 2
+}
