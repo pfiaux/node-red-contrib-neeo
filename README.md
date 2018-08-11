@@ -2,7 +2,11 @@
 
 Node-RED nodes for for interacting with the NEEO Brain.
 
-Currently WIP, more nodes/options to be implemented.
+Currently WIP, more nodes/options to be implemented. Once there's enough functionality I will submit it to npm so it can be easily accessed on the node-red search, for now the easy way to install it is:
+
+```
+npm install https://github.com/pfiaux/node-red-contrib-neeo
+```
 
 ## Nodes
 
