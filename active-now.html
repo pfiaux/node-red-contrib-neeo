@@ -4,7 +4,7 @@
     color: '#C0C0C0',
     defaults: {
       name:  { value: "" },
-      brain: { value: "", type: "neeo-brain" },
+      brain: { value: "", type: "neeo-brain", required: true },
     },
     inputs:1,
     outputs:1,
@@ -28,4 +28,5 @@
 
 <script type="text/x-red" data-help-name="active-now">
   <p>Fetches the currently active recipes on a NEEO Brain by ID.</p>
+  <p>Currently doesn't use any inputs.</p>
 </script>

@@ -1,9 +1,14 @@
 'use strict';
 
+const brainRoutes = require('./lib/routes');
 const brainAPI = require('./lib/brainAPI');
 
 module.exports = function(RED) {
-  function ActiveNowNode(config) {
+  brainRoutes.initializeIfNeeded(RED);
+  
+  RED.nodes.registerType('execute-recipe', ExecuteRecipeNode);
+
+  function ExecuteRecipeNode(config) {
     RED.nodes.createNode(this,config);
     const node = this;
 
@@ -18,21 +23,13 @@ module.exports = function(RED) {
 
       if (noBrainIp) {
         node.error('No NEEO Brain configured!');
-        node.send({ payload: [] });
         return;
       }
-
-      brainAPI.getActiveNow(node.brain.ip)
-        .then((activeNow) => {
-          const msg = { payload: activeNow };
-          node.send(msg);
-        })
+      
+      brainAPI.executeRecipe(node.brain.ip, config.roomkey, config.recipekey)
         .catch((error) => {
-          node.error(`Failed to fetch active now list: ${error.message}`);
-          node.send({ payload: [] });
+          node.error(`Failed to execute recipe: ${error.message}`);
         });
     });
   }
-  
-  RED.nodes.registerType('active-now', ActiveNowNode);
 };

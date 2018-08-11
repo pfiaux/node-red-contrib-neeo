@@ -1,0 +1,134 @@
+<script type="text/javascript">
+  (function() {
+    var recipes = [];
+
+    RED.nodes.registerType('execute-recipe', {
+      category: 'NEEO Brain',
+      color: '#C0C0C0',
+      defaults: {
+        brain: { value: "", type: "neeo-brain", required: true },
+        name:  { value: "" },
+        manualselection:  { value: false },
+        roomkey:  { value: "", required: true },
+        recipekey:  { value: "", required: true },
+      },
+      inputs: 1,
+      outputs: 0,
+      icon: "bridge.png",
+      label: function() {
+        return this.name || "execute recipe";
+      },
+      oneditprepare: oneditprepare,
+    });
+
+    function oneditprepare() {
+        var $inputBrain = $('#node-input-brain');
+        var $inputManualSelection = $('#node-input-manualselection');
+        var $inputRecipeKey = $('#node-input-recipekey');
+        var $inputRoomKey = $('#node-input-roomkey');
+        var $inputRecipeList = $('#execute-recipe-dynamic-list');
+        var $rowRoomKey = $('#execute-recipe-roomkey');
+        var $rowRecipeKey = $('#execute-recipe-recipekey');
+        var $rowRecipeDynamic = $('#execute-recipe-dynamic');
+        
+        showHideManualInput();
+        
+        if (!$inputManualSelection.prop('checked')) {
+          updateRecipes($inputBrain.val());
+        }
+        
+        $inputManualSelection.change(showHideManualInput);
+        $inputRecipeList.change(updateKeysUsingSelectedRecipe);
+        $inputBrain.change(function() {
+          updateRecipes($inputBrain.val());
+        });
+
+        function updateRecipes(brainNodeId) {
+          var recipeKey = $inputRecipeKey.val();
+          getRecipes(brainNodeId, function(_recipes) {
+            $inputRecipeList.children('option').remove();
+            recipes = _recipes;
+            var keys = Object.keys(recipes);
+            for (var i = 0; i < recipes.length; i++) {
+              var isSelected = recipes[i].recipeKey === recipeKey;
+              $('<option/>', {
+                'value': i,
+                'text': recipes[i].name,
+                'selected': isSelected ? 'selected' : false,
+              }).appendTo($inputRecipeList);
+            }
+          });
+        }
+
+        function updateKeysUsingSelectedRecipe() {
+          var index = $inputRecipeList.children('option:selected').first().val();
+          if (recipes) {
+            $inputRoomKey.val(recipes[index].roomKey);
+            $inputRecipeKey.val(recipes[index].recipeKey);
+          }
+        }
+
+        function showHideManualInput() {
+          if ($inputManualSelection.prop('checked')) {
+            $rowRoomKey.show();
+            $rowRecipeKey.show();
+            $rowRecipeDynamic.hide();
+          }
+          else {
+            $rowRoomKey.hide();
+            $rowRecipeKey.hide();
+            $rowRecipeDynamic.show();
+          }
+        }
+      }
+
+    function getRecipes(brainNodeId, callback) {
+      if (!brainNodeId) {
+        callback()
+        return;
+      }
+      $.getJSON('neeo/recipes?brainNodeId=' + brainNodeId, callback);
+    }
+  })()
+</script>
+
+<script type="text/x-red" data-template-name="execute-recipe">
+  <div class="form-row">
+    <label for="node-input-brain"><i class="fa fa-globe"></i> NEEO Brain</label>
+    <input type="text" id="node-input-brain">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-roomkey">&nbsp; </label>
+    <label for="node-input-manualselection">
+      <input type="checkbox"
+              id="node-input-manualselection"
+              style="display:inline-block; width:15px; vertical-align:baseline;">
+      Manually manage recipe settings.
+    </label>
+  </div>
+  <div class="form-row" id="execute-recipe-dynamic">
+    <label for="execute-recipe-dynamic-list">Recipe</label>
+    <select id="execute-recipe-dynamic-list">
+      <option value="">Select Brain to load recipes...</option>
+    </select>
+  </div>
+  <div class="form-row hidden" id="execute-recipe-roomkey">
+    <label for="node-input-roomkey">Recipe Room</label>
+    <input type="text" id="node-input-roomkey" placeholder="Room Key">
+  </div>
+  <div class="form-row hidden" id="execute-recipe-recipekey">
+    <label for="node-input-recipekey">Recipe</label>
+    <input type="text" id="node-input-recipekey" placeholder="Recipe Key">
+  </div>
+  
+</script>
+
+<script type="text/x-red" data-help-name="execute-recipe">
+  <p>Triggers the selectd recipe on the Brain.</p>
+  <p>Currently doesn't use any inputs.</p>
+</script>

@@ -6,7 +6,7 @@ const chai = require('chai');
 chai.use(require('sinon-chai'));
 const expect = chai.expect;
 
-const brain = require('../lib/brain.js');
+const brainAPI = require('../lib/brainAPI.js');
 const NEEOBrainNode = require('../neeo-brain.js');
 const ActiveNowNode = require('../active-now.js');
 
@@ -23,7 +23,7 @@ describe('active-now Node', function() {
   const sandbox = sinon.createSandbox();
 
   beforeEach(function() {
-    sandbox.stub(brain, 'getJSON')
+    sandbox.stub(brainAPI, 'getActiveNow')
       .resolves([]);
   });
  
@@ -50,14 +50,14 @@ describe('active-now Node', function() {
       { id: 'n2', type: 'helper' }
     ];
     const activeNow = [1];
-    brain.getJSON.resolves(activeNow);
+    brainAPI.getActiveNow.resolves(activeNow);
     
     helper.load(testNodes, flow, () => {
       const activeNowNode = helper.getNode('n1');
       const nextNode = helper.getNode('n2');
       nextNode.on('input', (msg) => {
         msg.should.have.property('payload', activeNow);
-        expect(brain.getJSON).to.have.been.calledWith('localhost');
+        expect(brainAPI.getActiveNow).to.have.been.calledWith('localhost');
         done();
       });
       activeNowNode.receive({ payload: '' });
@@ -70,7 +70,7 @@ describe('active-now Node', function() {
       { id: 'n1', type: NODE_TYPE, name: 'active-now', brain: 'n0', wires:[['n2']] },
       { id: 'n2', type: 'helper' }
     ];
-    brain.getJSON.rejects(new Error('unit test'));
+    brainAPI.getActiveNow.rejects(new Error('unit test'));
     
     helper.load(testNodes, flow, () => {
       const activeNowNode = helper.getNode('n1');
@@ -83,7 +83,7 @@ describe('active-now Node', function() {
     });
   });
 
-  it('should no brain set', function(done) {
+  it('should do nothing with no brain set', function(done) {
     const flow = [
       { id: 'n1', type: NODE_TYPE, name: 'active-now', wires:[['n2']] },
       { id: 'n2', type: 'helper' }
